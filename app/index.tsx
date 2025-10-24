@@ -110,7 +110,7 @@ export default function App() {
       <Text style={ styles.text_line2 }>
         Passord:
       </Text> 
-      <Text style={ styles.text_line3 }>
+      <Text style={ styles.text_line3 } selectable>
         {passord}
       </Text>
     </View>    
