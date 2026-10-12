@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 
 export default function App() {
@@ -8,16 +8,19 @@ export default function App() {
   const [isEnabledSmaaBokstaver, setIsEnabledSmaaBokstaver] = useState(false);
   const [isEnabledTall, setIsEnabledTall] = useState(false);
   const [isEnabledSymboler, setIsEnabledSymboler] = useState(false);
+  const [antallSymboler, setAntallSymboler] = useState("");
 
 
   // Funksjon for å generere tilfeldig passord
-  function genererPassord(isSmaaBokst, isStoreBokst, isTall, isSymb, antTegn) {    
+  function genererPassord(isSmaaBokst: boolean, isStoreBokst: boolean, isTall: boolean, isSymb: boolean, antTegn: number, minSymbols: number) {    
     let smaaBokstaver = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
     let storeBokstaver = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
     let tall = ["0","1","2","3","4","5","6","7","8","9"]
     let symboler = ["#","$","%","&","*"]
     let lovligeTegn = []
+
     
+
     if (isSmaaBokst) {
       lovligeTegn = lovligeTegn.concat(smaaBokstaver);
     }
@@ -31,12 +34,29 @@ export default function App() {
       lovligeTegn = lovligeTegn.concat(symboler);
     }
     let passord = []
-    for (let i = 0; i < antTegn; i++) {
+    for (let i=0; i < minSymbols; i++)
+    {
+      passord.push(symboler[Math.floor(Math.random() * symboler.length)])
+    }
+    let passLength = passord.length
+    for (let i = 0; i < antTegn-passLength; i++) {
       passord.push(lovligeTegn[Math.floor(Math.random() * lovligeTegn.length)])
     }
-    return passord;
+    let mixedPassord = passord.sort(() => Math.random() - 0.5)
+    return mixedPassord;
   }
+  function autoPassord(){
+  if (passord)
+    {
+      let array = [...passord]
+      let symboler = ["#","$","%","&","*"]
 
+    if (array.filter((item) => symboler.includes(item)).length < antallSymboler)
+    {
+      setPassord(genererPassord(isEnabledSmaaBokstaver, isEnabledStoreBokstaver, isEnabledTall, isEnabledSymboler, antallTegn, antallSymboler))
+    }
+    }
+  }
   return (
   <View style={ styles.screen }>
     <View style={ styles.container1 } >                    
@@ -87,7 +107,17 @@ export default function App() {
           thumbColor= {isEnabledSymboler ? "#f4f310" : "#f4f3f4"}        
           onValueChange={() => setIsEnabledSymboler(!isEnabledSymboler)}
           value={isEnabledSymboler}
-        />        
+        />
+      </View>
+      <View style={ styles.line }>
+        <Text style={ styles.text_line }>
+          Minimum antall symboler
+        </Text>
+          <TextInput 
+          style={ styles.input } 
+          onChangeText={(antallSymboler) => setAntallSymboler(antallSymboler)}
+          onSubmitEditing={() => void autoPassord()}
+        />    
       </View>
       <View style={ styles.line }>
         <Text style={ styles.text_line }>
@@ -103,7 +133,7 @@ export default function App() {
     <Button
         title="Generer passord"
         onPress={() => setPassord(genererPassord(isEnabledSmaaBokstaver, 
-            isEnabledStoreBokstaver, isEnabledTall, isEnabledSymboler, antallTegn))}
+            isEnabledStoreBokstaver, isEnabledTall, isEnabledSymboler, antallTegn, antallSymboler))}
       />
     </View>
     <View style={ styles.container3 }>
